@@ -1,3 +1,4 @@
 src/learn_to_normalize.egg-info
 .idea
 build
+docs/source/generated/
