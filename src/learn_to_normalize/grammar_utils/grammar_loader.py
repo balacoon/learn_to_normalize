@@ -29,12 +29,32 @@ class GrammarLoader:
     ]
 
     def __init__(self, grammars_dir: str):
-        self._grammars_dir = os.path.abspath(grammars_dir)
+        # all imports within grammars repo are done relative to parent dir of grammar repo.
+        # so <grammar_repo>/../ should be added to PYTHONPATH and suffix stored to be used
+        # during grammar loading. First <grammar_repo> directory should be identified
+        grammars_dir = os.path.abspath(grammars_dir)
+        # find the repo location
+        repo_dir = (
+            os.popen("cd {} && git rev-parse --show-toplevel".format(grammars_dir))
+            .read()
+            .strip()
+        )
+        # add to PYTHONPATH directory one level higher than repo
+        above_repo_dir = os.path.join(repo_dir, "..")
+        sys.path.append(above_repo_dir)
+        # find out location of rules inside of grammars repo
+        self._module_prefix = os.path.relpath(grammars_dir, above_repo_dir).replace(
+            "/", "."
+        )
+        self._grammars_dir = grammars_dir
+
         # test that there is minimal entry points for export
         for mode in self.NORMALIZATION_MODES:
             if not os.path.isfile(os.path.join(grammars_dir, mode, mode + ".py")):
                 raise RuntimeError(
-                    "Grammars directory is missing entry point: {}/{}.py".format(mode, mode)
+                    "Grammars directory is missing entry point: {}/{}.py".format(
+                        mode, mode
+                    )
                 )
         for config_name in self.CONFIGURATION_NAMES:
             config_path = os.path.join(grammars_dir, "configs", config_name)
@@ -44,9 +64,6 @@ class GrammarLoader:
                         config_path
                     )
                 )
-        # add grammars dir to PYTHONPATH, inside of grammars dir,
-        # they refer each other without prefix
-        sys.path.append(self._grammars_dir)
 
     def get_grammar(self, module_str: str, class_name: str) -> BaseFst:
         """
@@ -73,7 +90,7 @@ class GrammarLoader:
                     module_str, grammar_path
                 )
             )
-        module = importlib.import_module(module_str)
+        module = importlib.import_module(self._module_prefix + "." + module_str)
         if not hasattr(module, class_name):
             raise RuntimeError("{} doesn't have {}".format(grammar_path, class_name))
         grammar_class = getattr(module, class_name)

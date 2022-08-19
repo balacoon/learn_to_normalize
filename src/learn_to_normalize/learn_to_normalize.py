@@ -18,12 +18,13 @@ def parse_args():
     ap.add_argument(
         "--grammars",
         required=True,
-        help="Directory with normalization grammars. Those are stored in repos that are submodules to this repo.",
+        help="Directory with normalization grammars. Those are stored in repos that are submodules to this repo. "
+        "For ex. `grammars/en_us_normalization/production`",
     )
     ap.add_argument(
         "--locale",
         required=True,
-        help="Locale corresponding to resources, that will be stored in addon",
+        help="Locale corresponding to resources, that will be stored in addon. For ex. `en_us`",
     )
     ap.add_argument(
         "--work-dir",
