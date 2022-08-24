@@ -1,3 +1,4 @@
 absl-py==1.2.0
 pytest==7.1.2
+msgpack==1.0.4
 Cython==0.29.32
