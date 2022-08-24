@@ -12,6 +12,7 @@ import sys
 from typing import Tuple
 
 import pynini
+from pynini.export import grm
 
 from learn_to_normalize.grammar_utils.base_fst import BaseFst
 
@@ -120,7 +121,7 @@ class GrammarLoader:
         res: bytes
             serialized fst as bytes
         """
-        exporter = pynini.export.grm.Exporter(out_path)
+        exporter = grm.Exporter(out_path)
         exporter[rule_name] = fst
         exporter.close()
         with open(out_path, "rb") as fp:
@@ -193,8 +194,8 @@ class GrammarLoader:
         configs: Tuple[str, str, str]
             Loaded proto configurations as strings.
             There are 3 configurations required by text_normalization package:
-            tokenizer - defines name of the grammar and main rule
-            verbalizer - defines name of grammar and main rule
+            tokenizer configuration - defines name of the grammar and main rule
+            verbalizer configuration - defines name of grammar and main rule
             verbalizer serialization specification - fields of tokenized semiotic classes
         """
         configs = [
