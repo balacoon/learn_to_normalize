@@ -4,8 +4,12 @@ Copyright 2022 Balacoon
 Recipe to build an addon for text_normalization.
 """
 
+import os
+import shutil
 import argparse
 import logging
+
+import msgpack
 
 from learn_to_normalize.grammar_utils.grammar_loader import GrammarLoader
 
@@ -44,3 +48,17 @@ def main():
     args = parse_args()
 
     loader = GrammarLoader(args.grammars)
+    # TODO reuse fields from text_normalization package
+    addon = {"id": "normalization", "locale": args.locale}
+    tokenizer_config, verbalizer_config, verbalizer_specification = loader.get_configs()
+    addon["tokenizer_config"] = tokenizer_config
+    addon["verbalizer_config"] = verbalizer_config
+    addon["verbalizer_specification"] = verbalizer_specification
+    os.makedirs(args.work_dir, exist_ok=True)
+    addon["tokenizer"] = loader.get_tokenizer(args.work_dir)
+    addon["verbalizer"] = loader.get_verbalizer(args.work_dir)
+    default_addon_path = os.path.join(args.work_dir, "normalization.addon")
+    with open(default_addon_path, "wb") as fp:
+        msgpack.dump([addon], fp)
+    if args.out:
+        shutil.copy(default_addon_path, args.out)
