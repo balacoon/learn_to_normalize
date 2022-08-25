@@ -23,6 +23,8 @@ setup(
      [console_scripts]
      learn_to_normalize = learn_to_normalize.learn_to_normalize:main
      demo_grammar = learn_to_normalize.demo_grammar:main
+     evaluate = learn_to_normalize.evaluation.evaluate:main
+     demo_normalize = learn_to_normalize.demo_normalize:main
     """
 )
 
