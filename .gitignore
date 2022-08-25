@@ -2,3 +2,4 @@ src/learn_to_normalize.egg-info
 .idea
 build
 docs/source/generated/
+src/learn_to_normalize/evaluation/google_data/en_with_types
