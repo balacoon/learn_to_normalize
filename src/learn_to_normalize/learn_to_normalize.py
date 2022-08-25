@@ -11,6 +11,8 @@ import logging
 
 import msgpack
 
+from text_normalization import TextNormalizer as tn
+
 from learn_to_normalize.grammar_utils.grammar_loader import GrammarLoader
 
 
@@ -49,14 +51,14 @@ def main():
 
     loader = GrammarLoader(args.grammars)
     # TODO reuse fields from text_normalization package
-    addon = {"id": "normalization", "locale": args.locale}
+    addon = {tn.AddonFields.ID_KEY: tn.AddonFields.ID_VALUE, tn.AddonFields.LOCALE: args.locale}
     tokenizer_config, verbalizer_config, verbalizer_specification = loader.get_configs()
-    addon["tokenizer_config"] = tokenizer_config
-    addon["verbalizer_config"] = verbalizer_config
-    addon["verbalizer_specification"] = verbalizer_specification
+    addon[tn.AddonFields.TOKENIZER_CONFIG] = tokenizer_config
+    addon[tn.AddonFields.VERBALIZER_CONFIG] = verbalizer_config
+    addon[tn.AddonFields.VERBALIZER_SPECIFICATION] = verbalizer_specification
     os.makedirs(args.work_dir, exist_ok=True)
-    addon["tokenizer"] = loader.get_tokenizer(args.work_dir)
-    addon["verbalizer"] = loader.get_verbalizer(args.work_dir)
+    addon[tn.AddonFields.TOKENIZER] = loader.get_tokenizer(args.work_dir)
+    addon[tn.AddonFields.VERBALIZER] = loader.get_verbalizer(args.work_dir)
     default_addon_path = os.path.join(args.work_dir, "normalization.addon")
     with open(default_addon_path, "wb") as fp:
         msgpack.dump([addon], fp)
