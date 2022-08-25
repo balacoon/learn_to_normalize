@@ -4,8 +4,12 @@ Copyright 2022 Balacoon
 base class for all the grammars
 """
 
+from typing import Union, List
+
 import pynini
 from pynini.lib import pynutil
+
+from learn_to_normalize.grammar_utils.shortcuts import wrap_token, delete_space, insert_space
 
 
 class BaseFst:
@@ -13,19 +17,31 @@ class BaseFst:
     Base class for text normalization rules. Wrapper around
     pynini FST, implements some common functions used in
     tokenization / verbalization
+
+    BaseFST implements a logic of connecting transducer to itself, for ex. when it is allowed
+    to connect a semiotic class to itself. It is expected that implementations of BaseFst
+    would first define self._single_fst and then can call :func:`.connect_to_self` multiple times.
+    At usage (when merging all transducers together), one just refers to fst which returns
+    multi or single fst depending on what's available.
+
+    When reusing fst in other semiotic classes you probably want to access single_fst though.
     """
 
     def __init__(self, name: str):
         self._name = name
-        self._fst = None
+        self._single_fst = None
+        self._multi_fst = None
 
     @property
     def fst(self) -> pynini.FstLike:
-        return self._fst
+        if self._multi_fst is not None:
+            return self._multi_fst
+        assert self._single_fst is not None, "both single- and multi-token fsts are None for {}".format(self.name)
+        return self._single_fst
 
-    @fst.setter
-    def fst(self, fst):
-        self._fst = fst
+    @property
+    def single_fst(self) -> pynini.FstLike:
+        return self._single_fst
 
     def add_tokens(self, fst: pynini.FstLike) -> pynini.FstLike:
         """
@@ -59,6 +75,78 @@ class BaseFst:
             fst without grammar name and trailing straight slash
         """
         return pynutil.delete("{}|".format(self._name)) + fst
+
+    def connect_to_self(self, connector_in: Union[str, List[str]], connector_out: Union[str, List[str]],
+                        connector_spaces: str = "any", weight: float = 1.0, to_closure: bool = False):
+        """
+        Helper function which connects self.fst to itself through intermediate connector.
+        Should be applied at final stage of creating classification transducer
+        For example, allows to connect cardinals with a dash, i.e. "28 - 40" which means range.
+        It changes `self.fst` to `self.fst | (self.fst + connector + self.fst)`
+
+        Parameters
+        ----------
+        connector_in: Union[str, List[str]]
+            which connector tokens to look for. either single connector or multiple
+        connector_out: Union[str, List[str]]
+            what is the expansion of a connector. For example "-" in case of range is expanded to "to".
+        connector_spaces: str
+            defines which spaces are allowed around connector
+
+            `any` - means can be no or any number of spaces both form left and right from connector
+            `none_or_one` - means there is no spaces around connector or one from each side, for ex. 1:2 or 1 : 2.
+            `none` - there shouldn't be any spaces around connector
+
+        weight: float
+            weight to add to multi-token branch
+        to_closure: bool
+            if True, allows multiple repetitions of (connector + fst)
+        """
+        all_connectors = []
+        if isinstance(connector_in, str):
+            connector_in = [connector_in]
+        if isinstance(connector_out, str):
+            connector_out = [connector_out]
+        assert len(connector_in) == len(connector_out), "Number of in/out connectors should be the same!"
+
+        for c_in, c_out in zip(connector_in, connector_out):
+            if c_out:
+                connector = pynini.cross(c_in, c_out)
+                connector = pynutil.insert('name: "') + connector + pynutil.insert('"')
+                connector = wrap_token(connector)
+            else:
+                connector = pynutil.delete(c_in)
+
+            if connector_spaces == "any":
+                # remove all spaces (no matter how many including 0) and insert just one.
+                space = delete_space + insert_space
+            elif connector_spaces == "none_or_one":
+                # either accept just one space or expect no spaces and insert one
+                space = pynini.accep(" ") | insert_space
+            elif connector_spaces == "none":
+                # no spaces around connector expected
+                space = insert_space
+            else:
+                raise RuntimeError("Unexpected configuration of spaces around connector: {}".format(connector_spaces))
+
+            if c_out:
+                connector = space + connector + space
+            else:
+                connector = space + connector + delete_space
+            all_connectors.append(connector)
+        final_connector = pynini.union(*all_connectors)
+
+        extra_fst = pynutil.insert(' }') + final_connector + pynutil.insert('tokens { ') + self.single_fst
+        if to_closure:
+            extra_fst = pynini.closure(extra_fst, 1)
+        multi_fst = self.single_fst + extra_fst
+        if weight != 1.0:
+            multi_fst = pynutil.add_weight(multi_fst, weight)
+        if self._multi_fst is not None:
+            self._multi_fst |= multi_fst
+        else:
+            self._multi_fst = self._single_fst | multi_fst
+        self._multi_fst.optimize()
 
     def apply(self, text: str) -> str:
         """
