@@ -89,6 +89,9 @@ def main():
             logging.warning("\nExpected: " + normalized)
             logging.warning("Obtained: " + result)
             logging.warning("Original: " + unnormalized)
+            len_diff = abs(len(result) - len(normalized))
+            if len_diff > len(normalized) * 0.3:
+                logging.warning("Big difference^^^^^")
             incorrect_num += 1
     accuracy = (total_num - incorrect_num) / float(total_num)
     logging.warning("Accuracy: {}".format(accuracy))
