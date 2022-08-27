@@ -77,7 +77,8 @@ class BaseFst:
         return pynutil.delete("{}|".format(self._name)) + fst
 
     def connect_to_self(self, connector_in: Union[str, List[str]], connector_out: Union[str, List[str]],
-                        connector_spaces: str = "any", weight: float = 1.0, to_closure: bool = False):
+                        connector_spaces: str = "any", weight: float = 1.0, to_closure: bool = False,
+                        to_closure_connector: bool = False):
         """
         Helper function which connects self.fst to itself through intermediate connector.
         Should be applied at final stage of creating classification transducer
@@ -90,6 +91,7 @@ class BaseFst:
             which connector tokens to look for. either single connector or multiple
         connector_out: Union[str, List[str]]
             what is the expansion of a connector. For example "-" in case of range is expanded to "to".
+            If its none, transducer just deletes strings from `connector_in`
         connector_spaces: str
             defines which spaces are allowed around connector
 
@@ -101,40 +103,49 @@ class BaseFst:
             weight to add to multi-token branch
         to_closure: bool
             if True, allows multiple repetitions of (connector + fst)
+        to_closure_connector: bool
+            if True, also closure connector, so multiple occurrences of same connector between tokens are allowed
         """
-        all_connectors = []
         if isinstance(connector_in, str):
             connector_in = [connector_in]
-        if isinstance(connector_out, str):
-            connector_out = [connector_out]
-        assert len(connector_in) == len(connector_out), "Number of in/out connectors should be the same!"
+        if connector_out is not None:
+            if isinstance(connector_out, str):
+                connector_out = [connector_out]
+            assert len(connector_in) == len(connector_out), "Number of in/out connectors should be the same!"
 
-        for c_in, c_out in zip(connector_in, connector_out):
-            if c_out:
+        all_connectors = []
+        if connector_out:
+            for c_in, c_out in zip(connector_in, connector_out):
                 connector = pynini.cross(c_in, c_out)
                 connector = pynutil.insert('name: "') + connector + pynutil.insert('"')
                 connector = wrap_token(connector)
-            else:
-                connector = pynutil.delete(c_in)
+                all_connectors.append(connector)
+        else:
+            all_connectors = [pynutil.delete(x) for x in connector_in]
 
-            if connector_spaces == "any":
-                # remove all spaces (no matter how many including 0) and insert just one.
-                space = delete_space + insert_space
-            elif connector_spaces == "none_or_one":
-                # either accept just one space or expect no spaces and insert one
-                space = pynini.accep(" ") | insert_space
-            elif connector_spaces == "none":
-                # no spaces around connector expected
-                space = insert_space
-            else:
-                raise RuntimeError("Unexpected configuration of spaces around connector: {}".format(connector_spaces))
-
-            if c_out:
-                connector = space + connector + space
-            else:
-                connector = space + connector + delete_space
-            all_connectors.append(connector)
         final_connector = pynini.union(*all_connectors)
+        if to_closure_connector:
+            closured_connector = final_connector
+            if connector_out:
+                closured_connector = insert_space + final_connector
+            final_connector += pynini.closure(closured_connector)
+
+        # define spaces and surround connector with spaces
+        if connector_spaces == "any":
+            # remove all spaces (no matter how many including 0) and insert just one.
+            space = delete_space + insert_space
+        elif connector_spaces == "none_or_one":
+            # either accept just one space or expect no spaces and insert one
+            space = pynini.accep(" ") | insert_space
+        elif connector_spaces == "none":
+            # no spaces around connector expected
+            space = insert_space
+        else:
+            raise RuntimeError("Unexpected configuration of spaces around connector: {}".format(connector_spaces))
+        if connector_out:
+            final_connector = space + final_connector + space
+        else:
+            final_connector = space + final_connector + delete_space
 
         extra_fst = pynutil.insert(' }') + final_connector + pynutil.insert('tokens { ') + self.single_fst
         if to_closure:
