@@ -11,7 +11,7 @@ from typing import List, Union
 import pynini
 from pynini.lib import pynutil
 
-from learn_to_normalize.grammar_utils.shortcuts import LOWER, TO_LOWER
+from learn_to_normalize.grammar_utils.shortcuts import LOWER, TO_LOWER, NOT_ALPHA
 
 
 def load_csv(path: str) -> List[Union[str, List[str]]]:
@@ -112,7 +112,7 @@ def load_mapping(
     keys, values = zip(*rows)
 
     # transduce lowercase symbols as is, convert uppercase to lowercase
-    lower = pynini.closure(LOWER | TO_LOWER, 1)
+    lower = pynini.closure(LOWER | TO_LOWER | NOT_ALPHA, 1)
     # allow multi-word. applicable mostly for values (normalized version)
     lower = lower + pynini.closure(pynini.accep(" ") + lower)
 
