@@ -22,6 +22,10 @@ def parse_args():
         default="",
         help="If addon has multiple normalization fields sections, disambiguate one to use, by providing locale",
     )
+    ap.add_argument(
+        "--file",
+        help="If provided, reads utterances to normalize from a file"
+    )
     args = ap.parse_args()
     return args
 
@@ -31,9 +35,16 @@ def main():
     args = parse_args()
 
     normalizer = TextNormalizer(args.addon, args.locale)
-    while True:
-        utterance = input("Enter text: ")
-        if not utterance:
-            logging.info("No normalization for empty string")
-            continue
-        logging.info(normalizer.normalize(utterance))
+    if args.file:
+        with open(args.file, "r") as fp:
+            for line in fp:
+                line = line.strip()
+                if line:
+                    logging.info(normalizer.normalize(line))
+    else:
+        while True:
+            utterance = input("Enter text: ")
+            if not utterance:
+                logging.info("No normalization for empty string")
+                continue
+            logging.info(normalizer.normalize(utterance))
