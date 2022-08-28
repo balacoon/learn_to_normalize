@@ -4,6 +4,7 @@ Copyright 2022 Balacoon
 Interactive text normalization demo with create addon
 """
 
+import time
 import logging
 import argparse
 
@@ -36,11 +37,17 @@ def main():
 
     normalizer = TextNormalizer(args.addon, args.locale)
     if args.file:
+        num = 0
+        elapsed = 0
         with open(args.file, "r") as fp:
             for line in fp:
                 line = line.strip()
                 if line:
+                    start = time.time()
                     logging.info(normalizer.normalize(line))
+                    elapsed += time.time() - start
+                    num += 1
+        logging.info("Normalizing at {} seconds / utterance".format(elapsed / float(num)))
     else:
         while True:
             utterance = input("Enter text: ")
