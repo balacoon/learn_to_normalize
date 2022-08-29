@@ -32,18 +32,29 @@ In order to build text normalization addon:
 
 .. code-block::
 
-   # script is really simple shortcut to start container. Adjust it
-   # if needed
-   bash docker/run.sh
-   # create addon
-   learn_to_normalize --locale en_us --work-dir work_dir \
-       --resources grammars/en_us_normalization/production/ \
-       --out en_us_normalization.addon
+    # script is really simple shortcut to start container. Adjust it
+    # if needed
+    bash docker/run.sh
+    # create addon
+    learn_to_normalize --locale en_us --work-dir work_dir \
+        --resources grammars/en_us_normalization/production/ \
+        --out en_us_normalization.addon
 
 5. learn_to_normalize contains interactive demos for debugging
    and to showcase how to use obtained artifacts.
 
 .. code-block::
 
-   # executing single grammar to debug it
-   demo_grammar --grammars grammars/en_us_normalization/production/ --module classify.time --name TimeFst
+    # executing single grammar to debug it
+    demo_grammar --grammars grammars/en_us_normalization/production/ --module classify.time --name TimeFst
+    # using packed addon
+    demo_normalize --addon work_dir/normalization.addon
+
+6. finding flaws in rules, checking stability and evaluating performance of built rule-set is essential next
+   step:
+
+.. autosummary::
+    :toctree: generated
+
+    learn_to_normalize.evaluation
+

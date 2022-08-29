@@ -13,6 +13,9 @@ Recipe interacts with grammar directory through utils
     GrammarLoader
     BaseFst
 
+Some functions and pynini shortcuts that are reused in grammars
+throughout the locales are in data_loader.py and shortcuts.py
+
 """
 
 from learn_to_normalize.grammar_utils.base_fst import BaseFst
