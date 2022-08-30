@@ -11,7 +11,7 @@ bash $1 [--tag some_tag] [--build-tn] [--no-cache]
 
 Arguments:
 tag - tag of docker image, by default "latest"
-build-tn - text_normalization package is built from sources (private package)
+build-tn - balacoon_text_normalization package is built from sources (private package)
 no-cache - rebuild all docker layers from scratch
 EOF
 }

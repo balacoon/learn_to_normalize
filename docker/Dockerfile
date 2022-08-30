@@ -38,16 +38,16 @@ RUN cd /opt/thrax && \
     make -j $(nproc) && \
     make install
 
-# install text_normalization package,
-# which utilizes pronunciation addons
+# install balacoon_text_normalization package,
+# which utilizes normalization addons
 RUN --mount=type=ssh if [ "$build_tn" = "true" ]; then \
-    echo "Building pronunciation_generation from sources" && \
+    echo "Building balacoon_text_normalization from sources" && \
     cd /opt/ && \
-    git clone git@github.com:balacoon/text_normalization && \
-    pip install ./text_normalization ; \
+    git clone git@github.com:balacoon/balacoon_text_normalization && \
+    pip install ./balacoon_text_normalization ; \
 else \
-    echo "Installing pronunciation_generation from pip" && \
-    pip install text-normalization ; fi
+    echo "Installing balacoon_text_normalization from pip" && \
+    pip install balacoon-text-normalization ; fi
 
 # install package dependencies and package itself
 COPY ./ /opt/learn_to_normalize

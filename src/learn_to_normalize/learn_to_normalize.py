@@ -1,7 +1,7 @@
 """
 Copyright 2022 Balacoon
 
-Recipe to build an addon for text_normalization.
+Recipe to build an addon for balacoon_text_normalization.
 """
 
 import os
@@ -11,14 +11,14 @@ import logging
 
 import msgpack
 
-from text_normalization import TextNormalizer as tn
+from balacoon_text_normalization import TextNormalizer as tn
 
 from learn_to_normalize.grammar_utils.grammar_loader import GrammarLoader
 
 
 def parse_args():
     ap = argparse.ArgumentParser(
-        description="Packs rules for text conversion into spoken form, used by text_normalization package.",
+        description="Packs rules for text conversion into spoken form, used by balacoon_text_normalization package.",
         formatter_class=argparse.RawTextHelpFormatter,
     )
     ap.add_argument(

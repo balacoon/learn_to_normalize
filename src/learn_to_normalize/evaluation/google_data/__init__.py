@@ -17,7 +17,7 @@ For english, original paper reports 0.998 token-level accuracy for seq2seq model
 Accuracy is measured on first 100002 lines of output-00099-of-00100.
 
 Balacoon performance is measured on sentence-level, since we have slightly different set of semiotic classes.
-Google data is glued back together into utterances using `ParsedUtterance` and fed to `text_normalization` package.
+Google data is glued back together into utterances using `ParsedUtterance` and fed to `balacoon_text_normalization` package.
 We achieve 0.89 sentence-level accuracy.
 
 Vast majority of errors come from discrepancy in handling abbreviations and non-determinism in expanding numbers:
