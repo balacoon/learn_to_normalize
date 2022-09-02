@@ -32,7 +32,7 @@ autodoc_default_options = {"inherited-members": False}
 
 exclude_patterns = []
 
-autodoc_mock_imports = ["text_normalization", "tqdm", "pynini", "unidecode"]
+autodoc_mock_imports = ["balacoon_text_normalization", "tqdm", "pynini", "unidecode"]
 
 
 # -- Options for HTML output -------------------------------------------------
