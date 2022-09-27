@@ -22,7 +22,7 @@ NOT_SPACE = pynini.difference(CHAR, WHITE_SPACE).optimize()
 NOT_QUOTE = pynini.difference(CHAR, r'"').optimize()
 NOT_BAR = pynini.difference(CHAR, r"|").optimize()
 
-punct = "!'()-.,:;?{}\"`—«»"
+punct = "!'()-.,:;?{}\"`—«»_“”"
 PUNCT = pynini.union(*map(pynini.escape, punct)).optimize()
 NOT_PUNCT = pynini.difference(NOT_SPACE, PUNCT).optimize()
 NOT_ALPHA = pynini.difference(NOT_SPACE, ALPHA).optimize()
