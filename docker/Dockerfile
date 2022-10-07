@@ -44,6 +44,7 @@ RUN --mount=type=ssh if [ "$build_fe" = "true" ]; then \
     echo "Building balacoon_frontend from sources" && \
     cd /opt/ && \
     git clone git@github.com:balacoon/balacoon_frontend && \
+    pip install ninja && \
     pip install ./balacoon_frontend ; \
 else \
     echo "Installing balacoon_frontend from pip" && \
