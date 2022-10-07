@@ -40,7 +40,7 @@ RUN cd /opt/thrax && \
 
 # install balacoon_text_normalization package,
 # which utilizes normalization addons
-RUN --mount=type=ssh if [ "build_fe" = "true" ]; then \
+RUN --mount=type=ssh if [ "$build_fe" = "true" ]; then \
     echo "Building balacoon_frontend from sources" && \
     cd /opt/ && \
     git clone git@github.com:balacoon/balacoon_frontend && \
