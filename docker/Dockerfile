@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND="noninteractive" TZ="Europe/Berlin"
 
 # get ubuntu essentials to build packages
 RUN apt-get update
-RUN apt-get install -y openssh-client git vim autoconf automake libtool m4 gfortran autoconf-archive build-essential wget
+RUN apt-get install -y openssh-client git vim autoconf automake libtool m4 gfortran autoconf-archive build-essential wget cmake
 
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 
