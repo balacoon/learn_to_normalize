@@ -9,7 +9,7 @@ import tqdm
 import logging
 import argparse
 
-from balacoon_text_normalization import TextNormalizer
+from balacoon_frontend import TextNormalizer
 
 from learn_to_normalize.evaluation.data_iterator_factory import get_supported_datasets, get_data_iterator
 

@@ -61,7 +61,7 @@ class GrammarLoader:
             config_path = os.path.join(grammars_dir, "configs", config_name)
             if not os.path.isfile(config_path):
                 raise RuntimeError(
-                    "Grammars directory is missing balacoon_text_normalization proto config: {}".format(
+                    "Grammars directory is missing balacoon_frontend proto config: {}".format(
                         config_path
                     )
                 )
@@ -187,13 +187,13 @@ class GrammarLoader:
 
     def get_configs(self) -> Tuple[str, str, str]:
         """
-        Loads configurations required by balacoon_text_normalization
+        Loads configurations required by balacoon_frontend
 
         Returns
         -------
         configs: Tuple[str, str, str]
             Loaded proto configurations as strings.
-            There are 3 configurations required by balacoon_text_normalization package:
+            There are 3 configurations required by balacoon_frontend package:
             tokenizer configuration - defines name of the grammar and main rule
             verbalizer configuration - defines name of grammar and main rule
             verbalizer serialization specification - fields of tokenized semiotic classes

@@ -2,7 +2,7 @@
 
 FROM python:3.8-slim
 
-ARG build_tn
+ARG build_fe
 ARG user_id
 ARG group_id
 
@@ -40,14 +40,14 @@ RUN cd /opt/thrax && \
 
 # install balacoon_text_normalization package,
 # which utilizes normalization addons
-RUN --mount=type=ssh if [ "$build_tn" = "true" ]; then \
-    echo "Building balacoon_text_normalization from sources" && \
+RUN --mount=type=ssh if [ "build_fe" = "true" ]; then \
+    echo "Building balacoon_frontend from sources" && \
     cd /opt/ && \
-    git clone git@github.com:balacoon/balacoon_text_normalization && \
-    pip install ./balacoon_text_normalization ; \
+    git clone git@github.com:balacoon/balacoon_frontend && \
+    pip install ./balacoon_frontend ; \
 else \
-    echo "Installing balacoon_text_normalization from pip" && \
-    pip install balacoon-text-normalization ; fi
+    echo "Installing balacoon_frontend from pip" && \
+    pip install -i https://pypi.fury.io/balacoon/ balacoon-frontend ; fi
 
 # install package dependencies and package itself
 COPY ./ /opt/learn_to_normalize

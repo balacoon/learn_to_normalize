@@ -7,18 +7,18 @@ set -x
 usage() {
     cat <<EOF
 Usage:
-bash $1 [--tag some_tag] [--build-tn] [--no-cache]
+bash $1 [--tag some_tag] [--build-fe] [--no-cache]
 
 Arguments:
 tag - tag of docker image, by default "latest"
-build-tn - balacoon_text_normalization package is built from sources (private package)
+build-fe - balacoon_frontend package is built from sources (private package)
 no-cache - rebuild all docker layers from scratch
 EOF
 }
 
 docker_image_name="learn_to_normalize"
 tag="latest"
-build_tn_opt=""
+build_fe_opt=""
 no_cache_opt=""
 ssh_keys_opt=""
 while [ "$1" != "" ]; do
@@ -27,8 +27,8 @@ while [ "$1" != "" ]; do
             shift
             tag=$1
         ;;
-        --build-tn )
-            build_pg_opt="--build-arg build_tn=true"
+        --build-fe )
+            build_fe_opt="--build-arg build_fe=true"
         ;;
         --no-cache )
 	    no_cache_opt="--no-cache"
@@ -43,7 +43,7 @@ while [ "$1" != "" ]; do
 done
 
 DOCKER_BUILDKIT=1 docker build --ssh default $no_cache_opt \
-	-t $docker_image_name:$tag $build_pg_opt \
+	-t $docker_image_name:$tag $build_fe_opt \
 	--build-arg user_id=$(id -u) --build-arg group_id=$(id -g) \
 	-f docker/Dockerfile .
 

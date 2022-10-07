@@ -8,7 +8,7 @@ import time
 import logging
 import argparse
 
-from balacoon_text_normalization import TextNormalizer
+from balacoon_frontend import TextNormalizer
 
 
 def parse_args():
