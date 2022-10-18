@@ -28,13 +28,14 @@ RUN wget -O /opt/pynini-2.1.3.tar.gz \
 # build and install OpenFST
 RUN cd /opt/openfst && \
     ./configure --enable-python --enable-mpdt --enable-far --enable-pdt \
-        --enable-shared --enable-ngram-fsts --enable-grm && \
+        --enable-shared --enable-ngram-fsts --enable-grm \
+        CXXFLAGS=-fPIC\ -D_GLIBCXX_USE_CXX11_ABI=0 && \
     make -j $(nproc) && \
     make install
 
 # build and install thrax
 RUN cd /opt/thrax && \
-    ./configure && \
+    ./configure CPPFLAGS=-fPIC\ -D_GLIBCXX_USE_CXX11_ABI=0 && \
     make -j $(nproc) && \
     make install
 
@@ -55,6 +56,7 @@ COPY ./ /opt/learn_to_normalize
 RUN pip install -r /opt/learn_to_normalize/requirements.txt
 # install pynini (not in pip)
 RUN cd /opt && tar -zxvf pynini-2.1.3.tar.gz && rm pynini-2.1.3.tar.gz && \
+    CFLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" CXXFLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" \
     pip install ./pynini-2.1.3
 RUN pip install /opt/learn_to_normalize
 
